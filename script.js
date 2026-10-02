@@ -2,31 +2,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* =====================================================
        ELEMENTOS
-       ===================================================== */
+    ====================================================== */
 
-    const header = document.getElementById("header");
-    const menuToggle = document.getElementById("menuToggle");
-    const menuClose = document.getElementById("menuClose");
-    const mobileMenu = document.getElementById("mobileMenu");
-    const backTop = document.getElementById("backTop");
+    const header = document.querySelector(".site-header");
+    const menuButton = document.querySelector(".menu-button");
+    const mobileMenu = document.querySelector(".mobile-menu");
+    const backToTop = document.querySelector(".back-to-top");
 
-    const navLinks = document.querySelectorAll(".nav-link");
-    const mobileLinks = document.querySelectorAll(".mobile-link");
+    const mobileLinks = document.querySelectorAll(
+        ".mobile-menu a"
+    );
 
-    const sections = document.querySelectorAll("main section[id]");
+    const navLinks = document.querySelectorAll(
+        ".desktop-nav a"
+    );
 
-    const revealElements = document.querySelectorAll(".reveal");
+    const revealElements = document.querySelectorAll(
+        ".reveal"
+    );
 
 
     /* =====================================================
        HEADER AO ROLAR
-       ===================================================== */
+    ====================================================== */
 
     function updateHeader() {
 
         if (!header) return;
 
-        if (window.scrollY > 50) {
+        if (window.scrollY > 40) {
             header.classList.add("scrolled");
         } else {
             header.classList.remove("scrolled");
@@ -34,68 +38,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-    updateHeader();
+    window.addEventListener(
+        "scroll",
+        updateHeader,
+        { passive: true }
+    );
 
-    window.addEventListener("scroll", updateHeader, {
-        passive: true
-    });
+    updateHeader();
 
 
     /* =====================================================
        MENU MOBILE
-       ===================================================== */
+    ====================================================== */
 
     function openMenu() {
 
-        if (!mobileMenu) return;
+        if (!menuButton || !mobileMenu) return;
 
-        mobileMenu.classList.add("open");
+        menuButton.classList.add("active");
 
-        document.body.classList.add("menu-open");
+        mobileMenu.classList.add("active");
 
-        if (menuToggle) {
-            menuToggle.setAttribute(
-                "aria-expanded",
-                "true"
-            );
-        }
+        menuButton.setAttribute(
+            "aria-expanded",
+            "true"
+        );
 
+        document.body.style.overflow = "hidden";
     }
 
 
     function closeMenu() {
 
+        if (!menuButton || !mobileMenu) return;
+
+        menuButton.classList.remove("active");
+
+        mobileMenu.classList.remove("active");
+
+        menuButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        document.body.style.overflow = "";
+    }
+
+
+    function toggleMenu() {
+
         if (!mobileMenu) return;
 
-        mobileMenu.classList.remove("open");
-
-        document.body.classList.remove("menu-open");
-
-        if (menuToggle) {
-            menuToggle.setAttribute(
-                "aria-expanded",
-                "false"
-            );
+        if (mobileMenu.classList.contains("active")) {
+            closeMenu();
+        } else {
+            openMenu();
         }
 
     }
 
 
-    if (menuToggle) {
+    if (menuButton) {
 
-        menuToggle.addEventListener(
+        menuButton.addEventListener(
             "click",
-            openMenu
-        );
-
-    }
-
-
-    if (menuClose) {
-
-        menuClose.addEventListener(
-            "click",
-            closeMenu
+            toggleMenu
         );
 
     }
@@ -124,8 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       REVEAL AO ENTRAR NA TELA
-       ===================================================== */
+       ANIMAÇÕES AO ENTRAR NA TELA
+    ====================================================== */
 
     if ("IntersectionObserver" in window) {
 
@@ -173,93 +180,93 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       LINKS INTERNOS
-       ===================================================== */
+       SCROLL SUAVE
+    ====================================================== */
 
-    document
-        .querySelectorAll('a[href^="#"]')
-        .forEach(link => {
+    document.querySelectorAll(
+        'a[href^="#"]'
+    ).forEach(link => {
 
-            link.addEventListener(
-                "click",
-                event => {
+        link.addEventListener(
+            "click",
+            event => {
 
-                    const targetId =
-                        link.getAttribute("href");
+                const targetId =
+                    link.getAttribute("href");
 
-                    if (
-                        !targetId ||
-                        targetId === "#"
-                    ) {
-                        return;
-                    }
-
-                    const target =
-                        document.querySelector(
-                            targetId
-                        );
-
-                    if (!target) {
-                        return;
-                    }
-
-                    event.preventDefault();
-
-                    const headerHeight =
-                        header
-                            ? header.offsetHeight
-                            : 0;
-
-                    const targetPosition =
-                        target.getBoundingClientRect().top +
-                        window.scrollY -
-                        headerHeight;
-
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: "smooth"
-                    });
-
+                if (
+                    !targetId ||
+                    targetId === "#"
+                ) {
+                    return;
                 }
-            );
 
-        });
+
+                const target =
+                    document.querySelector(targetId);
+
+                if (!target) return;
+
+                event.preventDefault();
+
+
+                const headerHeight =
+                    header
+                        ? header.offsetHeight
+                        : 0;
+
+
+                const targetPosition =
+                    target.getBoundingClientRect().top +
+                    window.scrollY -
+                    headerHeight;
+
+
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: "smooth"
+                });
+
+            }
+        );
+
+    });
 
 
     /* =====================================================
-       BOTÃO VOLTAR AO TOPO
-       ===================================================== */
+       VOLTAR AO TOPO
+    ====================================================== */
 
-    function updateBackTop() {
+    function updateBackToTop() {
 
-        if (!backTop) return;
+        if (!backToTop) return;
 
         if (window.scrollY > 600) {
 
-            backTop.classList.add("show");
+            backToTop.classList.add("visible");
 
         } else {
 
-            backTop.classList.remove("show");
+            backToTop.classList.remove("visible");
 
         }
 
     }
 
-    updateBackTop();
 
     window.addEventListener(
         "scroll",
-        updateBackTop,
-        {
-            passive: true
-        }
+        updateBackToTop,
+        { passive: true }
     );
 
 
-    if (backTop) {
+    updateBackToTop();
 
-        backTop.addEventListener(
+
+    if (backToTop) {
+
+        backToTop.addEventListener(
             "click",
             () => {
 
@@ -276,62 +283,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* =====================================================
        MENU ATIVO CONFORME A SEÇÃO
-       ===================================================== */
+    ====================================================== */
 
-    function updateActiveNavigation() {
+    const sections = document.querySelectorAll(
+        "main section[id]"
+    );
 
-        let currentSection = "";
+
+    if (
+        "IntersectionObserver" in window &&
+        navLinks.length
+    ) {
+
+        const sectionObserver =
+            new IntersectionObserver(
+                entries => {
+
+                    entries.forEach(entry => {
+
+                        if (!entry.isIntersecting) {
+                            return;
+                        }
+
+
+                        navLinks.forEach(link => {
+
+                            link.classList.remove(
+                                "active"
+                            );
+
+                        });
+
+
+                        const activeLink =
+                            document.querySelector(
+                                `.desktop-nav a[href="#${entry.target.id}"]`
+                            );
+
+
+                        if (activeLink) {
+
+                            activeLink.classList.add(
+                                "active"
+                            );
+
+                        }
+
+                    });
+
+                },
+                {
+                    rootMargin:
+                        "-35% 0px -55% 0px"
+                }
+            );
+
 
         sections.forEach(section => {
 
-            const sectionTop =
-                section.offsetTop - 180;
-
-            const sectionBottom =
-                sectionTop +
-                section.offsetHeight;
-
-            if (
-                window.scrollY >= sectionTop &&
-                window.scrollY < sectionBottom
-            ) {
-
-                currentSection =
-                    section.getAttribute("id");
-
-            }
-
-        });
-
-
-        navLinks.forEach(link => {
-
-            const href =
-                link.getAttribute("href");
-
-            link.classList.toggle(
-                "active",
-                href === `#${currentSection}`
-            );
+            sectionObserver.observe(section);
 
         });
 
     }
 
-    updateActiveNavigation();
-
-    window.addEventListener(
-        "scroll",
-        updateActiveNavigation,
-        {
-            passive: true
-        }
-    );
-
 
     /* =====================================================
-       FECHAR MENU SE A JANELA VOLTAR PARA DESKTOP
-       ===================================================== */
+       FECHAR MENU AO VOLTAR PARA DESKTOP
+    ====================================================== */
 
     window.addEventListener(
         "resize",
@@ -348,103 +367,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       PARALLAX LEVE DO HERO
-       ===================================================== */
+       ANO AUTOMÁTICO DO FOOTER
+    ====================================================== */
 
-    const hero = document.querySelector(".hero");
-    const heroImage =
-        document.querySelector(".hero-image img");
-
-    if (
-        hero &&
-        heroImage &&
-        window.matchMedia(
-            "(min-width: 751px)"
-        ).matches
-    ) {
-
-        hero.addEventListener(
-            "mousemove",
-            event => {
-
-                const rect =
-                    hero.getBoundingClientRect();
-
-                const x =
-                    (event.clientX - rect.left) /
-                    rect.width -
-                    0.5;
-
-                const y =
-                    (event.clientY - rect.top) /
-                    rect.height -
-                    0.5;
-
-                const moveX = x * 8;
-                const moveY = y * 5;
-
-                heroImage.style.transform =
-                    `scale(1.03) translate(${moveX}px, ${moveY}px)`;
-
-            }
+    const yearElement =
+        document.getElementById(
+            "currentYear"
         );
 
 
-        hero.addEventListener(
-            "mouseleave",
-            () => {
+    if (yearElement) {
 
-                heroImage.style.transform =
-                    "scale(1.03) translate(0, 0)";
-
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       ANO DO FOOTER
-       ===================================================== */
-
-    const year =
-        document.getElementById("year");
-
-    if (year) {
-
-        year.textContent =
+        yearElement.textContent =
             new Date().getFullYear();
 
     }
 
 
     /* =====================================================
-       VERIFICAÇÃO DAS IMAGENS
-       ===================================================== */
+       PROTEÇÃO CONTRA IMAGENS QUEBRADAS
+    ====================================================== */
 
-    const images =
-        document.querySelectorAll("img");
+    document.querySelectorAll("img")
+        .forEach(image => {
 
-    images.forEach(image => {
+            image.addEventListener(
+                "error",
+                () => {
 
-        image.addEventListener(
-            "error",
-            () => {
+                    console.warn(
+                        "Imagem não encontrada:",
+                        image.getAttribute("src")
+                    );
 
-                console.warn(
-                    "Imagem não encontrada:",
-                    image.getAttribute("src")
-                );
+                }
+            );
 
-            }
-        );
-
-    });
+        });
 
 
     /* =====================================================
        LOG
-       ===================================================== */
+    ====================================================== */
 
     console.log(
         "Raquel Marcolino — site carregado com sucesso."
