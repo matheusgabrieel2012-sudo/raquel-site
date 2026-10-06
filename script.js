@@ -1,198 +1,144 @@
-document.addEventListener("DOMContentLoaded", () => {
-
-    /* =====================================================
-       ELEMENTOS
-    ====================================================== */
-
-    const header = document.querySelector(".site-header");
-    const menuButton = document.querySelector(".menu-button");
-    const mobileMenu = document.querySelector(".mobile-menu");
-    const backToTop = document.querySelector(".back-to-top");
-
-    const mobileLinks = document.querySelectorAll(
-        ".mobile-menu a"
-    );
-
-    const navLinks = document.querySelectorAll(
-        ".desktop-nav a"
-    );
-
-    const revealElements = document.querySelectorAll(
-        ".reveal"
-    );
+/* =========================================================
+   RAQUEL MARCOLINO
+   WEBSITE JAVASCRIPT
+========================================================= */
 
 
-    /* =====================================================
-       HEADER AO ROLAR
-    ====================================================== */
+/* =========================================
+   ELEMENTOS
+========================================= */
 
-    function updateHeader() {
+const header = document.getElementById("header");
+const menuButton = document.getElementById("menuButton");
+const nav = document.getElementById("nav");
+const heroBackground = document.querySelector(".hero-background");
 
-        if (!header) return;
 
-        if (window.scrollY > 40) {
-            header.classList.add("scrolled");
-        } else {
-            header.classList.remove("scrolled");
-        }
+/* =========================================
+   HEADER AO ROLAR
+========================================= */
+
+function handleHeader() {
+
+    if (window.scrollY > 40) {
+
+        header.classList.add("scrolled");
+
+    } else {
+
+        header.classList.remove("scrolled");
 
     }
 
-    window.addEventListener(
-        "scroll",
-        updateHeader,
-        { passive: true }
-    );
+}
 
-    updateHeader();
+window.addEventListener("scroll", handleHeader);
+
+handleHeader();
 
 
-    /* =====================================================
-       MENU MOBILE
-    ====================================================== */
+/* =========================================
+   MENU MOBILE
+========================================= */
 
-    function openMenu() {
+if (menuButton && nav) {
 
-        if (!menuButton || !mobileMenu) return;
+    menuButton.addEventListener("click", () => {
 
-        menuButton.classList.add("active");
+        const isActive = menuButton.classList.toggle("active");
 
-        mobileMenu.classList.add("active");
+        nav.classList.toggle("active");
 
         menuButton.setAttribute(
             "aria-expanded",
-            "true"
+            isActive ? "true" : "false"
         );
 
-        document.body.style.overflow = "hidden";
-    }
+    });
+
+}
 
 
-    function closeMenu() {
+/* =========================================
+   FECHAR MENU AO CLICAR
+========================================= */
 
-        if (!menuButton || !mobileMenu) return;
+const navLinks = document.querySelectorAll(".nav a");
+
+navLinks.forEach(link => {
+
+    link.addEventListener("click", () => {
 
         menuButton.classList.remove("active");
 
-        mobileMenu.classList.remove("active");
+        nav.classList.remove("active");
 
         menuButton.setAttribute(
             "aria-expanded",
             "false"
         );
 
-        document.body.style.overflow = "";
-    }
-
-
-    function toggleMenu() {
-
-        if (!mobileMenu) return;
-
-        if (mobileMenu.classList.contains("active")) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
-
-    }
-
-
-    if (menuButton) {
-
-        menuButton.addEventListener(
-            "click",
-            toggleMenu
-        );
-
-    }
-
-
-    mobileLinks.forEach(link => {
-
-        link.addEventListener(
-            "click",
-            closeMenu
-        );
-
     });
 
+});
 
-    document.addEventListener(
-        "keydown",
-        event => {
 
-            if (event.key === "Escape") {
-                closeMenu();
-            }
+/* =========================================
+   SCROLL REVEAL
+========================================= */
 
+const revealElements =
+    document.querySelectorAll(".reveal");
+
+const revealObserver =
+    new IntersectionObserver(
+
+        entries => {
+
+            entries.forEach(entry => {
+
+                if (entry.isIntersecting) {
+
+                    entry.target.classList.add("visible");
+
+                    revealObserver.unobserve(
+                        entry.target
+                    );
+
+                }
+
+            });
+
+        },
+
+        {
+            threshold: 0.12
         }
+
     );
 
 
-    /* =====================================================
-       ANIMAÇÕES AO ENTRAR NA TELA
-    ====================================================== */
+revealElements.forEach(element => {
 
-    if ("IntersectionObserver" in window) {
+    revealObserver.observe(element);
 
-        const observer = new IntersectionObserver(
-            entries => {
-
-                entries.forEach(entry => {
-
-                    if (entry.isIntersecting) {
-
-                        entry.target.classList.add(
-                            "visible"
-                        );
-
-                        observer.unobserve(
-                            entry.target
-                        );
-
-                    }
-
-                });
-
-            },
-            {
-                threshold: 0.12
-            }
-        );
+});
 
 
-        revealElements.forEach(element => {
+/* =========================================
+   SMOOTH SCROLL
+========================================= */
 
-            observer.observe(element);
+document
+    .querySelectorAll('a[href^="#"]')
+    .forEach(anchor => {
 
-        });
-
-    } else {
-
-        revealElements.forEach(element => {
-
-            element.classList.add("visible");
-
-        });
-
-    }
-
-
-    /* =====================================================
-       SCROLL SUAVE
-    ====================================================== */
-
-    document.querySelectorAll(
-        'a[href^="#"]'
-    ).forEach(link => {
-
-        link.addEventListener(
+        anchor.addEventListener(
             "click",
-            event => {
+            function(event) {
 
                 const targetId =
-                    link.getAttribute("href");
+                    this.getAttribute("href");
 
                 if (
                     !targetId ||
@@ -201,30 +147,30 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-
                 const target =
                     document.querySelector(targetId);
 
-                if (!target) return;
+                if (!target) {
+                    return;
+                }
 
                 event.preventDefault();
 
-
                 const headerHeight =
-                    header
-                        ? header.offsetHeight
-                        : 0;
-
+                    header.offsetHeight;
 
                 const targetPosition =
                     target.getBoundingClientRect().top +
                     window.scrollY -
-                    headerHeight;
-
+                    headerHeight -
+                    15;
 
                 window.scrollTo({
+
                     top: targetPosition,
+
                     behavior: "smooth"
+
                 });
 
             }
@@ -233,185 +179,100 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    /* =====================================================
-       VOLTAR AO TOPO
-    ====================================================== */
+/* =========================================
+   PARALLAX DO HERO
+========================================= */
 
-    function updateBackToTop() {
+window.addEventListener("scroll", () => {
 
-        if (!backToTop) return;
-
-        if (window.scrollY > 600) {
-
-            backToTop.classList.add("visible");
-
-        } else {
-
-            backToTop.classList.remove("visible");
-
-        }
-
+    if (!heroBackground) {
+        return;
     }
 
-
-    window.addEventListener(
-        "scroll",
-        updateBackToTop,
-        { passive: true }
-    );
-
-
-    updateBackToTop();
-
-
-    if (backToTop) {
-
-        backToTop.addEventListener(
-            "click",
-            () => {
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
-
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       MENU ATIVO CONFORME A SEÇÃO
-    ====================================================== */
-
-    const sections = document.querySelectorAll(
-        "main section[id]"
-    );
-
+    const scrollPosition =
+        window.scrollY;
 
     if (
-        "IntersectionObserver" in window &&
-        navLinks.length
+        scrollPosition <
+        window.innerHeight
     ) {
 
-        const sectionObserver =
-            new IntersectionObserver(
-                entries => {
-
-                    entries.forEach(entry => {
-
-                        if (!entry.isIntersecting) {
-                            return;
-                        }
-
-
-                        navLinks.forEach(link => {
-
-                            link.classList.remove(
-                                "active"
-                            );
-
-                        });
-
-
-                        const activeLink =
-                            document.querySelector(
-                                `.desktop-nav a[href="#${entry.target.id}"]`
-                            );
-
-
-                        if (activeLink) {
-
-                            activeLink.classList.add(
-                                "active"
-                            );
-
-                        }
-
-                    });
-
-                },
-                {
-                    rootMargin:
-                        "-35% 0px -55% 0px"
-                }
-            );
-
-
-        sections.forEach(section => {
-
-            sectionObserver.observe(section);
-
-        });
+        heroBackground.style.transform =
+            `scale(1.03) translateY(${scrollPosition * 0.12}px)`;
 
     }
 
+});
 
-    /* =====================================================
-       FECHAR MENU AO VOLTAR PARA DESKTOP
-    ====================================================== */
 
-    window.addEventListener(
-        "resize",
-        () => {
+/* =========================================
+   WHATSAPP
+========================================= */
 
-            if (
-                window.innerWidth > 750
-            ) {
-                closeMenu();
-            }
-
-        }
+const whatsappButtons =
+    document.querySelectorAll(
+        'a[href*="wa.me"]'
     );
 
+whatsappButtons.forEach(button => {
 
-    /* =====================================================
-       ANO AUTOMÁTICO DO FOOTER
-    ====================================================== */
+    button.addEventListener("click", () => {
 
-    const yearElement =
-        document.getElementById(
-            "currentYear"
+        console.log(
+            "WhatsApp: contato iniciado."
         );
 
+    });
 
-    if (yearElement) {
-
-        yearElement.textContent =
-            new Date().getFullYear();
-
-    }
+});
 
 
-    /* =====================================================
-       PROTEÇÃO CONTRA IMAGENS QUEBRADAS
-    ====================================================== */
+/* =========================================
+   ANO AUTOMÁTICO
+========================================= */
 
-    document.querySelectorAll("img")
-        .forEach(image => {
+const copyright =
+    document.getElementById("copyright");
 
-            image.addEventListener(
-                "error",
-                () => {
+if (copyright) {
 
-                    console.warn(
-                        "Imagem não encontrada:",
-                        image.getAttribute("src")
-                    );
+    copyright.textContent =
+        `© ${new Date().getFullYear()} Raquel Marcolino`;
 
-                }
-            );
-
-        });
+}
 
 
-    /* =====================================================
-       LOG
-    ====================================================== */
+/* =========================================
+   IMAGENS
+========================================= */
 
-    console.log(
-        "Raquel Marcolino — site carregado com sucesso."
+const images =
+    document.querySelectorAll("img");
+
+images.forEach(image => {
+
+    image.addEventListener(
+        "load",
+        () => {
+
+            image.classList.add("loaded");
+
+        }
     );
 
 });
+
+
+/* =========================================
+   CONSOLE
+========================================= */
+
+console.log(
+    "%cRAQUEL MARCOLINO",
+    "font-size: 20px; font-weight: bold;"
+);
+
+console.log(
+    "%cWebsite carregado com sucesso.",
+    "font-size: 12px;"
+);
